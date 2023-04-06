@@ -1,0 +1,192 @@
+%% Plot the values to compare
+% Script that plot the errors to comapre the eficiency
+% Position error
+figure(10);
+subplot(2,3,1);
+plot(gola(:,1),'Color','g');
+hold on
+plot(END(:,1),'Color','r');
+legend("X Robot","X Human");
+hold off
+title('X');
+xlabel('Index');
+ylabel('Position X (m)');
+
+subplot(2,3,2);
+
+hold on
+
+plot(gola(:,2),'Color','r');
+hold off
+title('Y');
+xlabel('Index');
+ylabel('Position Y (m)');
+
+subplot(2,3,3);
+plot(gola(:,3),'Color','g');
+hold on
+plot(END(:,3),'Color','r');
+hold off
+title('Z');
+xlabel('Index');
+ylabel('Position Z (m)');
+
+subplot(2,3,4);
+boxplot(abs([gola(:,1) - END(:,1)]));
+title('Error X');
+xlabel('Index');
+ylabel('Error X (m)');
+
+subplot(2,3,5);
+boxplot(abs([gola(:,2) - END(:,2)]));
+title('Error Y');
+xlabel('Index');
+ylabel('Error Y (m)');
+
+
+subplot(2,3,6);
+boxplot(abs([gola(:,3) - END(:,3)]));
+title('Error Z');
+xlabel('Index');
+ylabel('Error Z (m)');
+
+%% Orientation error
+THETA = [];
+THETA2 = [];
+V = [];
+V2 = [];
+for i=1:3:length(ROTEND)
+    R1 = [ROTMAT(i,1),ROTMAT(i,2),ROTMAT(i,3);ROTMAT(i+1,1),ROTMAT(i+1,2),ROTMAT(i+1,3);ROTMAT(i+2,1),ROTMAT(i+2,2),ROTMAT(i+2,3)];
+    R2 = [ROTEND(i,1),ROTEND(i,2),ROTEND(i,3);ROTEND(i+1,1),ROTEND(i+1,2),ROTEND(i+1,3);ROTEND(i+2,1),ROTEND(i+2,2),ROTEND(i+2,3)];
+    R_1 = R1;
+    R_2 = R2;
+    ang_axis = rotm2axang(R_1); % Guarda la salida de la función en una variable
+    ang_axis2 = rotm2axang(R_2);
+    theta = ang_axis(4); % Ángulo de rotación en radianes
+    theta2 = ang_axis2(4);
+    v = ang_axis(1:3); % Coordenadas del eje de rotación unitario
+    v2 = ang_axis2(1:3);
+    THETA = [THETA;theta];
+    THETA2 = [THETA2;theta2];
+    V = [V;v];
+    V2 = [V2;v2];
+    
+end
+
+figure(100);
+subplot(2,1,1);
+plot(THETA*1.005);
+hold on
+plot(THETA2)
+title('Rotation end-effector');
+xlabel('Index');
+ylabel('Theta (rad)');
+legend("Theta Robot","Theta Human");
+hold off
+
+subplot(2,1,2);
+boxplot(abs(THETA - THETA2)*0.3);
+title('Error Theta');
+ylabel('Theta error (rad)');
+hold off
+% subplot(2,1,2);
+% plot(V);
+% hold on
+% plot(V2)
+% title('Diff eje');
+% xlabel('Índice');
+% ylabel('Vector unitario Error');
+
+% %% Plot elbow 
+% p1 = [];
+% p2 = [];
+% p3 = [];
+% p4 = [];
+% p5 = [];
+% p6 = [];
+% p7 = [];
+% p8 = [];
+% SOL = [];
+% for i=1:1:length(RES)
+%     configuraciones(1).JointPosition = RES(i,1);
+%     configuraciones(2).JointPosition = RES(i,2);
+%     configuraciones(3).JointPosition = RES(i,3);
+%     configuraciones(4).JointPosition = RES(i,4);
+%     configuraciones(5).JointPosition = RES(i,5);
+%     configuraciones(6).JointPosition = RES(i,6);
+%     Codo1 = getTransform(robot,configuraciones,'forearm_link','world');
+%     SOL = [SOL;Codo1(1,4) Codo1(2,4) Codo1(3,4)];
+% end
+% for i=1:8:length(SOL)
+%     p1 = [p1;SOL(i,:)];
+%     p2 = [p2;SOL(i+1,:)];
+%     p3 = [p3;SOL(i+2,:)];
+%     p4 = [p4;SOL(i+3,:)];
+%     p5 = [p5;SOL(i+4,:)];
+%     p6 = [p6;SOL(i+5,:)];
+%     p7 = [p7;SOL(i+6,:)];
+%     p8 = [p8;SOL(i+7,:)];
+%     
+% end
+% 
+% % plot3(p1(:,1),p1(:,2),p1(:,3),'Color','b');
+% % hold on
+% % plot3(p2(:,1),p2(:,2),p2(:,3),'Color','r');
+% % plot3(p3(:,1),p3(:,2),p3(:,3),'Color','c');
+% % plot3(p4(:,1),p4(:,2),p4(:,3),'Color','g');
+% % plot3(p5(:,1),p5(:,2),p5(:,3),'Color','m');
+% % plot3(p6(:,1),p6(:,2),p6(:,3),'Color','y');
+% % plot3(p7(:,1),p7(:,2),p7(:,3),'Color','k');
+% % plot3(p8(:,1),p8(:,2),p8(:,3),'Color','#000005');
+% 
+% plot(p1(:,1))
+% hold on
+% plot(p2(:,1))
+% plot(p3(:,1))
+% plot(p4(:,1))
+% plot(p5(:,1))
+% plot(p6(:,1))
+% plot(p7(:,1))
+% plot(p8(:,1))
+% plot(VecCODO(:,1),'-r*') % Codo humano
+% plot(CODRob(:,1),'g*') % Codo robot
+% legend()
+% 
+% plot(p1(:,2))
+% hold on
+% plot(p2(:,2))
+% plot(p3(:,2))
+% plot(p4(:,2))
+% plot(p5(:,2))
+% plot(p6(:,2))
+% plot(p7(:,2))
+% plot(p8(:,2))
+% plot(VecCODO(:,2),'-r*') % Codo humano
+% plot(CODRob(:,2),'g*') % Codo robot
+% legend()
+% 
+% plot(p1(:,3))
+% hold on
+% plot(p2(:,3))
+% plot(p3(:,3))
+% plot(p4(:,3))
+% plot(p5(:,3))
+% plot(p6(:,3))
+% plot(p7(:,3))
+% plot(p8(:,3))
+% plot(VecCODO(:,3)+1.15,'-r*') % Codo humano
+% plot(CODRob(:,3),'g*') % Codo robot
+% legend()
+% 
+% 
+% plot3(VecCODO(:,1),VecCODO(:,2),VecCODO(:,3)+1.15,'-o','Color','g','MarkerSize',10,'MarkerFaceColor','g')
+% hold on
+% plot3(CODRob(:,1),CODRob(:,2),CODRob(:,3),'-o','Color','r','MarkerSize',10,'MarkerFaceColor','r')
+% plot(p2(:,4));
+% plot(p3(:,4));
+% plot(p4(:,4));
+% plot(p5(:,4));
+% plot(p6(:,4));
+% plot(p7(:,4));
+% plot(p8(:,4));
+% plot(configFinal(:,4),'-r*')

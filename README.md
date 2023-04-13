@@ -24,12 +24,12 @@ conda activate taichi
 ## Install from source
 Firstly, clone the repository in your system.
 ```bash
-git clone (link)
+git clone https://github.com/AdrianPrados/TAICHI.git
 ```
 
 Then, enter the directory and install the required dependencies
 ```bash
-cd taichi
+cd TAICHI
 pip install -r requirements.txt
 ```
 
@@ -43,10 +43,80 @@ The code is divided in two files:
 `PythonCode` stores all the files to apply the algorithm directly in Python.
 
 ### **MatlabCode**
+The code available in **MatlabCode** contains:
 
+`bodyx.stl` allows to load the full model of the ADAM robot in different body parts.
 
+`HumanLikeArm.m` allows to run the full process once the data has been acquired.
 
+`IK_UR.m` allows calculate the Analytical Inverse Kinematics (AIK) for different UR models such as UR3, UR5 and UR10.
 
+If you want to use different UR model, in `IK_UR.m` modify the variables for the line:
+
+```matlab
+res = double(pyrunfile("UR3_Inverse_Kinematics.py","Sol",M = npM,name = name,launcher = launcher));
+```
+where `name` can be `ur3`, `ur5` or `ur10` and `launcher` can be `matlab` or `python`. The previous line calls `UR3_Inverse_Kinematics.py` that obtain the AIK values.
+
+`distanceMetric.m` function to evaluate the distance between the human elbow and the rest of the robotic joints.
+
+`distOrientation` function to evaluate the orientation of the end effector.
+
+`distPosition` function to evaluate the position of the end effector.
+
+`variationWrist` function to evaluate the wrist variation between the previous state and the actual state.
+
+`PlotError.m` function to plot the error for the end-effector respect the human wrist.
+
+To use the **MatlabCode** just run the `HumanLikeArm.m` script modifying the values of the path were the data is stored.
+
+```matlab
+path = '/your_directory/HumanLikeCode/HumanData/PruebaX/DatosBrazoHumano.csv';
+path2 = '/your_directory/HumanLikeCode/HumanData/PruebaX/CodoHumano.csv';
+```
+### **PythonCode**
+The code available in **PythonCode** contains:
+
+`HumanLikeArm.py` works exactly the same as the MatlabCode one but all in Python.
+
+`UR3_Inverse_Kinematics.py` allows to obtains the AIK solutions. The script return 8 solution for each point taking into account the limits for each arm.
+
+`brazoProf.py` acquired the data from the camera an save it in the path specified. Must be the same that you use in `HumanLikeArm.py` and 
+`HumanLikeArm.m`.
+
+To use the **PythonCode** just run the `HumanLikeArm.py` script modifying the values of the path were the data is stored.
+
+``` bash
+cd Taichi/PythonCode
+python HumanLikeArm.py
+```
+
+### **Data Acquisition**
+The acquisition of the data can be only done using Python. For that purpose, you have to run the `brazoProf.py`:
+
+``` bash
+cd Taichi/PythonCode
+python brazoProf.py
+```
+This will open a window that show the user moving with the MediaPipe lines for the Pose estimation and Hand Tracking.
+
+<p align="center">
+  <img src="./Images/DataCamera.png" height=200 />
+</p>
+
+Once the data as been acquired, pushing `q` or `esc` allows to stop the data acquisition. After that and previously to the storage of the data, a Gaussian Filter is applied. The filtered can be seen for wrist and elbow position and wrist orientation using:
+
+``` python
+plot_smoothed_EndEfector(DATOSPRE,XEnd,YEnd,ZEnd)
+plot_smoothed_Elbow(CORCODOPRE,XElbow,YElbow,ZElbow)
+plot_smoothed_rotations(DATOSPRE,R1,R2,R3,R4,R5,R6,R7,R8,R9)
+```
+
+<p align="center">
+  <img src="./Images/Gaussian.png" height=200 />
+</p>
+
+> **Note**: At the moment, the algorithm only works for the left arm. To obtain correct data, the right arm must be hide.
 
 # Citation
 If you use this code, please quote our work :blush:

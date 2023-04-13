@@ -1,9 +1,0 @@
-function [DRAO] = distOrientation(r,h)
-    % Con esta forma sacamos el angulo de otra maner, no se si vale tambien
-    %theta = dist(r,h);
-    %DRAO = (1 - cos(theta))/2;
-    
-    % Forma segun el paper
-    []
-end
-

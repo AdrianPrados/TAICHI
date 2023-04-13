@@ -43,6 +43,10 @@ The code is divided in two files:
 `PythonCode` stores all the files to apply the algorithm directly in Python.
 
 ### **MatlabCode**
+*Matlab Requierements:*
+- Robotics System Toolbox
+- Phased Array System Toolbox
+
 The code available in **MatlabCode** contains:
 
 `bodyx.stl` allows to load the full model of the ADAM robot in different body parts.

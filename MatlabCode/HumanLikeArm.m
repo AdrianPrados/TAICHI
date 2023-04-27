@@ -48,8 +48,10 @@ sv.Environment = env;
 % hold off
 %% Inverse kinematics solver
 %% Read the files
-path = '/home/nox/BrazoCamara/ur_ikfast/DatosHumano/Prueba6/DatosBrazoHumano.csv';
-path2 = '/home/nox/BrazoCamara/ur_ikfast/DatosHumano/Prueba6/CodoHumano.csv';
+
+path = '/home/blanca/Documentos/GitHub/TAICHI/HumanData/Prueba2/DatosBrazoHumano.csv'; 
+path2 = '/home/blanca/Documentos/GitHub/TAICHI/HumanData/Prueba2/CodoHumano.csv'; 
+
 matrixRead = readmatrix(path);
 CodoRead = readmatrix(path2);
 CodoOrganizado = [];
@@ -74,7 +76,8 @@ W_rax = 1; %Position weigth
 W_rao = 10; %Orientation weigth
 W_A = 50; %Humanity weigth
 %Evaluation loop
-gola = [];
+gola = []; %Goal Point with respect to human shoulder CS
+gola2 = []; %Goal Point with respect to human shoulder CS rotated 45
 matrixCodo = zeros(4,4);
 for i=1:4:iter
     k = k+1;
@@ -88,6 +91,7 @@ for i=1:4:iter
         matrixRead(i+1,1) matrixRead(i+1,2) matrixRead(i+1,3) matrixRead(i+1,4);
         matrixRead(i+2,1) matrixRead(i+2,2) matrixRead(i+2,3) matrixRead(i+2,4);
         matrixRead(i+3,1) matrixRead(i+3,2) matrixRead(i+3,3) matrixRead(i+3,4)];
+    matrix2 = inv(T) * matrix;
     matrix(1:3,1:3)  = rotz(180) * matrix(1:3,1:3);
     matrix(1:2,4) = -matrix(1:2,4);
     matrix = T * matrix;
@@ -95,11 +99,12 @@ for i=1:4:iter
     % Elbow matrix
     VectorCodo = [CodoOrganizado(k,1), CodoOrganizado(k,2),CodoOrganizado(k,3)];
     VecCODO = [VecCODO;VectorCodo];
-    X_RAGoal = [matrixRead(i,4) matrixRead(i+1,4) matrixRead(i+2,4)];
-    gola = [gola;X_RAGoal];
-    Rot_mat = [matrixRead(i,1) matrixRead(i,2) matrixRead(i,3);
-        matrixRead(i+1,1) matrixRead(i+1,2) matrixRead(i+1,3);
-        matrixRead(i+2,1) matrixRead(i+2,2) matrixRead(i+2,3)];
+    X_RAGoal = [matrix2(1,4) matrix2(2,4) matrix2(3,4)];
+    gola = [gola;[matrixRead(i,4) matrixRead(i+1,4) matrixRead(i+2,4)]];
+    gola2 = [gola2;X_RAGoal];
+    Rot_mat = [matrix2(1,1) matrix2(1,2) matrix2(1,3);
+        matrix2(2,1) matrix2(2,2) matrix2(2,3);
+        matrix2(3,1) matrix2(3,2) matrix2(3,3)];
     EulerAngles = rotm2eul(Rot_mat);
     quat_h = eul2quat(EulerAngles);
     
@@ -120,7 +125,7 @@ for i=1:4:iter
             if ~any(validState)
 
                 % End efector for the specific configuration
-                EfectorFinal = getTransform(robot,configSoln,'tool0','world');
+                EfectorFinal = getTransform(robot,configSoln,'tool0','base_link');
                 X_RA = [EfectorFinal(1,4) EfectorFinal(2,4) EfectorFinal(3,4)];
                 Rot_EF =[EfectorFinal(1,1) EfectorFinal(1,2) EfectorFinal(1,3);
                     EfectorFinal(2,1) EfectorFinal(2,2) EfectorFinal(2,3);
@@ -129,27 +134,27 @@ for i=1:4:iter
                 quat_r = eul2quat(EulerAnglesEF);
 
                 % Detect if the point is in the limits'
-                pointEnd = [gola(k,1)+0.07,gola(k,2)+0.13,gola(k,3)+1.15];
-                checkConfig
+                %pointEnd = [gola(k,1)+0.07,gola(k,2)+0.13,gola(k,3)+1.15];
+                %checkConfig
 
                 % Wrist 2
-                Wrist2 = getTransform(robot,configSoln,'wrist_2_link','world');
+                Wrist2 = getTransform(robot,configSoln,'wrist_2_link','base_link');
                 S_wrist2 = [Wrist2(1,4) Wrist2(2,4) Wrist2(3,4)];
 
                 % Wrist 1
-                Wrist1 = getTransform(robot,configSoln,'wrist_1_link','world');
+                Wrist1 = getTransform(robot,configSoln,'wrist_1_link','base_link');
                 S_wrist1 = [Wrist1(1,4) Wrist1(2,4) Wrist1(3,4)];
 
                 % Wrist 3
-                Wrist3 = getTransform(robot,configSoln,'wrist_3_link','world');
+                Wrist3 = getTransform(robot,configSoln,'wrist_3_link','base_link');
                 S_wrist3 = [Wrist3(1,4) Wrist3(2,4) Wrist3(3,4)];
 
                 %Elbow
-                Codo = getTransform(robot,configSoln,'forearm_link','world');
+                Codo = getTransform(robot,configSoln,'forearm_link','base_link');
                 S_codo = [Codo(1,4) Codo(2,4) Codo(3,4)];
 
                 %Shoulder
-                HombroSaliente = getTransform(robot,configSoln,'shoulder_link','world');
+                HombroSaliente = getTransform(robot,configSoln,'shoulder_link','base_link');
                 S_hombro = [HombroSaliente(1,4) HombroSaliente(2,4) HombroSaliente(3,4)];
 
                 %Calculate the diference in position
@@ -158,7 +163,7 @@ for i=1:4:iter
                 d_RAo = distOrientation(quat_r,quat_h);
                 % Calculate the diference between the human elbow and the
                 % rest of the arm
-                MDistancia = distanceMetric(VectorCodo, S_wrist2,S_wrist1,S_wrist3,S_codo,S_hombro);
+                MDistancia = distanceMetric(VectorCodo, S_wrist2,S_wrist1,S_wrist3,S_codo,S_hombro,gola');
                
                 %Wrist error estimation
                 if i == 1 || ~exist('Wrist_old','var')
@@ -170,7 +175,7 @@ for i=1:4:iter
                 
 
                 % Check if it is finished
-                if correct == true && DistFinal < DistDif && configSoln(1).JointPosition >= HombroLim(1) && configSoln(1).JointPosition <= HombroLim(2) && configSoln(2).JointPosition >= HombroLim2(1) && configSoln(2).JointPosition <= HombroLim2(2)
+                if d_RAx<=0.05 && d_RAo <= 0.16 && DistFinal < DistDif && configSoln(1).JointPosition >= HombroLim(1) && configSoln(1).JointPosition <= HombroLim(2) && configSoln(2).JointPosition >= HombroLim2(1) && configSoln(2).JointPosition <= HombroLim2(2)
                     DistDif = DistFinal;
                     MejorConfig = [configSoln(1).JointPosition configSoln(2).JointPosition configSoln(3).JointPosition configSoln(4).JointPosition configSoln(5).JointPosition configSoln(6).JointPosition];
                     mejor_ii = ii;
@@ -197,6 +202,7 @@ for i=1:4:iter
 end
 % Filter the incorrect data and correct the position values
 gola(PEORES,:) = [];
+gola2(PEORES,:) = [];
 gola =[gola(:,1)+0.07,gola(:,2)+0.13,gola(:,3)+1.15];
 
 %% Plot the movements of the robotics arm respect the human elbow and wrist
@@ -223,7 +229,7 @@ for i=1:1:length(configFinal)
     configuraciones(6).JointPosition = configFinal(i,6);
     zoom(gca,'on');
     show(robot,configuraciones,"Collisions","off");
-    CodoR = getTransform(robot,configuraciones,'forearm_link','world');
+    CodoR = getTransform(robot,configuraciones,'forearm_link','base_link');
     CODRob = [CODRob;CodoR(1,4) CodoR(2,4) CodoR(3,4)];
     camzoom(1.7);
     hold on
@@ -235,7 +241,7 @@ for i=1:1:length(configFinal)
     plot3(VecCODO(k,1)+0.07,VecCODO(k,2)+0.13,VecCODO(k,3)+1.15,'o','Color','g','MarkerSize',10,'MarkerFaceColor','g')
     plot3(gola(k,1),gola(k,2),gola(k,3),'o','Color','r','MarkerSize',10,'MarkerFaceColor','r')
     hold on
-    PuntoEnd = getTransform(robot,configuraciones,'tool0','world');
+    PuntoEnd = getTransform(robot,configuraciones,'tool0','base_link');
     Punto = [gola(k,1),gola(k,2),gola(k,3)];
     END = [END;PuntoEnd(1,4),PuntoEnd(2,4),PuntoEnd(3,4)];
     ROTEND = [ROTEND;PuntoEnd(1,1),PuntoEnd(1,2),PuntoEnd(1,3);PuntoEnd(2,1),PuntoEnd(2,2),PuntoEnd(2,3);PuntoEnd(3,1),PuntoEnd(3,2),PuntoEnd(3,3)];
@@ -246,14 +252,14 @@ end
 
 %% Plot in 3D (smoothed to visualized it better)
 figure;
-plot3(gola(:,1),gola(:,2),gola(:,3),'Color','g');
+plot3(gola2(:,1),gola2(:,2),gola2(:,3),'Color','g');
 hold on
 xlabel('X (m)')
 ylabel('Y (m)')
 zlabel('Z (m)')
 plot3(END(:,1),END(:,2),END(:,3),'Color','b');
-plot3(gola(1,1),gola(1,2),gola(1,3),'o','Color','r','MarkerSize',8,'MarkerFaceColor','r');
-plot3(gola(length(gola),1),gola(length(gola),2),gola(length(gola),3),'o','Color','m','MarkerSize',8,'MarkerFaceColor','m');
+plot3(gola2(1,1),gola2(1,2),gola2(1,3),'o','Color','r','MarkerSize',8,'MarkerFaceColor','r');
+plot3(gola2(length(gola2),1),gola2(length(gola2),2),gola2(length(gola2),3),'o','Color','m','MarkerSize',8,'MarkerFaceColor','m');
 [t,s]=title("Comparision between data acquired");
 t.FontSize = 16;
 legend('Robot data','Human data','Initial point','Final point')

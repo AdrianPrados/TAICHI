@@ -3,7 +3,7 @@
 % Position error
 figure(10);
 subplot(3,2,1);
-plot(gola(:,1),'Color','g');
+plot(gola2(:,1),'Color','g');
 hold on
 plot(END(:,1),'Color','r');
 legend("X Robot","X Human");
@@ -16,7 +16,7 @@ subplot(3,2,2);
 plot(END(:,2),'Color','g');
 hold on
 
-plot(gola(:,2),'Color','r');
+plot(gola2(:,2),'Color','r');
 legend("Y Robot","Y Human");
 hold off
 title('Y');
@@ -24,7 +24,7 @@ title('Y');
 ylabel('Position Y (m)');
 
 subplot(3,2,3);
-plot(gola(:,3),'Color','g');
+plot(gola2(:,3),'Color','g');
 hold on
 plot(END(:,3),'Color','r');
 legend("Z Robot","Z Human");
@@ -34,7 +34,7 @@ title('Z');
 ylabel('Position Z (m)');
 
 subplot(3,2,4);
-boxplot(abs([gola(:,:) - END(:,:)]),'Labels',{'Error X','Error Y','Error Z'});
+boxplot(abs(gola2(:,:) - END(:,:)),'Labels',{'Error X','Error Y','Error Z'});
 title('Position Error');
 ylabel('Error (m)');
 

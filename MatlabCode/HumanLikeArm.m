@@ -49,8 +49,8 @@ sv.Environment = env;
 %% Inverse kinematics solver
 %% Read the files
 
-path = '/home/blanca/Documentos/GitHub/TAICHI/HumanData/Prueba2/DatosBrazoHumano.csv'; 
-path2 = '/home/blanca/Documentos/GitHub/TAICHI/HumanData/Prueba2/CodoHumano.csv'; 
+path = '/home/nox/BrazoCamara/ur_ikfast/DatosHumano/Prueba1/DatosBrazoHumano.csv';
+path2 = '/home/nox/BrazoCamara/ur_ikfast/DatosHumano/Prueba1/CodoHumano.csv';
 
 matrixRead = readmatrix(path);
 CodoRead = readmatrix(path2);
@@ -173,9 +173,11 @@ for i=1:4:iter
                 end
                 DistFinal = real(W_rax*d_RAx + W_rao*d_RAo + W_A*MDistancia + ErroWrist);
                 
+                CodoRobotrot = rotx(45)*S_codo';
+                WristRobotRot = rotx(45)*S_wrist1';
 
                 % Check if it is finished
-                if d_RAx<=0.05 && d_RAo <= 0.16 && DistFinal < DistDif && configSoln(1).JointPosition >= HombroLim(1) && configSoln(1).JointPosition <= HombroLim(2) && configSoln(2).JointPosition >= HombroLim2(1) && configSoln(2).JointPosition <= HombroLim2(2)
+                if d_RAx<=0.05 && d_RAo <= 0.16 && ~(CodoRobotrot(2)<-0.1 && WristRobotRot(2)>CodoRobotrot(2)) && DistFinal < DistDif && configSoln(1).JointPosition >= HombroLim(1) && configSoln(1).JointPosition <= HombroLim(2) && configSoln(2).JointPosition >= HombroLim2(1) && configSoln(2).JointPosition <= HombroLim2(2)
                     DistDif = DistFinal;
                     MejorConfig = [configSoln(1).JointPosition configSoln(2).JointPosition configSoln(3).JointPosition configSoln(4).JointPosition configSoln(5).JointPosition configSoln(6).JointPosition];
                     mejor_ii = ii;

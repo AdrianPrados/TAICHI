@@ -1,4 +1,4 @@
-pyrealsense
+pyrealsense2
 mediapipe
 opencv-python
 scipy

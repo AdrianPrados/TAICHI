@@ -17,10 +17,10 @@ To be used on your device, follow the installation steps below.
 It is highly recommended to install all the dependencies on a new virtual environment. For more information check the conda documentation for [installation](https://conda.io/projects/conda/en/latest/user-guide/install/index.html) and [environment management](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html). For creating the environment use the following commands on the terminal.
 
 ```bash
-conda create -n taichi python==3.10.9
+conda create -n taichi python=3.10.0 numpy=1.24.2
 conda activate taichi
 ```
-
+> **Note**: It is import to use numpy version 1.24.2 to dont have problems in the Matlab execution (versions higher than 1.25 have Warnings in the data processing from Python to Matlab).
 ## Install from source
 Firstly, clone the repository in your system.
 ```bash

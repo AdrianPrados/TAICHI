@@ -123,6 +123,26 @@ plot_smoothed_rotations(DATOSPRE,R1,R2,R3,R4,R5,R6,R7,R8,R9)
 > **Note**: At the moment, the algorithm only works for the left arm. To obtain correct data, the right arm must be hide.
 
 # Citation
-If you use this code, please quote our work :blush:
+If you use this code, please quote our works :blush:
+```
+@inproceedings{prados2023tracking,
+  title={Tracking humano visual aplicado a manipuladores no antropom{\'o}rficos para imitaci{\'o}n},
+  author={Prados, Adri{\'a}n and L{\'o}pez, Blanca and Barber, Ramon and Moreno, Luis},
+  booktitle={XLIV Jornadas de Autom{\'a}tica},
+  pages={714--719},
+  year={2023},
+  organization={Universidade da Coru{\~n}a. Servizo de Publicaci{\'o}ns}
+}
 
-In construction :construction_worker:
+```
+```
+@inproceedings{lopez2023taichi,
+  title={TAICHI algorithm: Human-Like Arm Data Generation applied on Non-Anthropomorphic Robotic Manipulators for Demonstration},
+  author={Lopez, Blanca and Prados, Adrian and Moreno, Luis and Barber, Ramon},
+  booktitle={2023 European Conference on Mobile Robots (ECMR)},
+  pages={1--7},
+  year={2023},
+  organization={IEEE}
+}
+
+```
